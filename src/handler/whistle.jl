@@ -48,7 +48,6 @@ Handle whistle blower reports. The complete flow is as follows:
 7. Log an audit event.
 """
 function handler(c::Client, e::MessageReactionAdd, ::Val{:whistle})
-
     if e.emoji.name === WHISTLE_EMOJI
         @info "MessageReactionAdd (whistle)" e.user_id e.channel_id e.message_id e.emoji
 
@@ -76,18 +75,23 @@ function handler(c::Client, e::MessageReactionAdd, ::Val{:whistle})
 
         # thank reporter
         dm_channel = fetchval(create_dm(c; recipient_id=e.user_id))
-        uuid = string(uuid4())[end - 11:end]
+        uuid = string(uuid4())[(end - 11):end]
         reference = " (Reference ID: $uuid)"
-        @discord create(c, Message, dm_channel;
-            content=WHISTLE_BLOWER_THANK_YOU_MESSAGE * reference)
+        @discord create(
+            c, Message, dm_channel; content=WHISTLE_BLOWER_THANK_YOU_MESSAGE * reference
+        )
 
         # remember this report
         push!(prior_user_reports, e.message_id)
 
         # log an audit event
         user = @discord retrieve(c, User, e.user_id)
-        audit("whistle",
-            user.id, user.username, user.discriminator,
-            "message_id=$(e.message_id) uuid=$uuid count=$count")
+        audit(
+            "whistle",
+            user.id,
+            user.username,
+            user.discriminator,
+            "message_id=$(e.message_id) uuid=$uuid count=$count",
+        )
     end
 end

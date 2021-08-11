@@ -9,11 +9,9 @@ struct BadWord
 end
 
 const WordClassStrings = Dict(
-    Bad => "Bad",
-    Questionable => "Questionable",
-    Overridden => "Overridden",
+    Bad => "Bad", Questionable => "Questionable", Overridden => "Overridden"
 )
 
 function Base.show(io::IO, w::BadWord)
-    print(io, WordClassStrings[w.class], "(", w.word, ")")
+    return print(io, WordClassStrings[w.class], "(", w.word, ")")
 end

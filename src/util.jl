@@ -45,7 +45,7 @@ function audit(
     discriminator::AbstractString,
     message::AbstractString;
     audit_dir=joinpath("data", "audit"),
-    audit_file=joinpath(audit_dir, "$source.log")
+    audit_file=joinpath(audit_dir, "$source.log"),
 )
     open(ensurepath!(audit_file); write=true, append=true) do io
         println(io, "$(now(tz"UTC"))\t$name#$discriminator\t$user_id\t$message")
@@ -84,14 +84,13 @@ function load_names(filename::String)::Dict{String,Dict{String,String}}
 end
 
 function update_names_count(
-        source::AbstractString,
-        name::AbstractString,
-        channel_id::UInt64,
-        channel_name::AbstractString,
-        count_docs_dir=joinpath("data", "docs"),
-        count_names_file=joinpath(count_docs_dir, "$source.json")
-    )
-
+    source::AbstractString,
+    name::AbstractString,
+    channel_id::UInt64,
+    channel_name::AbstractString,
+    count_docs_dir=joinpath("data", "docs"),
+    count_names_file=joinpath(count_docs_dir, "$source.json"),
+)
     isfile(count_names_file) || write(ensurepath!(count_names_file), "{}")
     namescount = JSON.parsefile(count_names_file)
 
@@ -99,37 +98,28 @@ function update_names_count(
         Dict(
             "when" => """$(now(tz"UTC"))""",
             "channel" => "$channel_name",
-            "channel_id" => "$channel_id"
-        )
+            "channel_id" => "$channel_id",
+        ),
     ]
 
     if name in keys(namescount)
         namescount[name]["count"] += 1
-        append!(
-            namescount[name]["info"], info
-        )
+        append!(namescount[name]["info"], info)
     else
-        push!(
-            namescount,
-                name => Dict(
-                    "count" => 1,
-                    "info" => info
-                )
-        )
+        push!(namescount, name => Dict("count" => 1, "info" => info))
     end
     write(count_names_file, JSON.json(namescount, 4))
     return namescount[name]["count"]
 end
 
 function stats_namescount(
-        source::AbstractString;
-        place::AbstractString="top",
-        number::Int=20,
-        name::AbstractString="",
-        count_docs_dir=joinpath("data", "docs"),
-        count_names_file=joinpath(count_docs_dir, "$source.json")
-    )
-
+    source::AbstractString;
+    place::AbstractString="top",
+    number::Int=20,
+    name::AbstractString="",
+    count_docs_dir=joinpath("data", "docs"),
+    count_names_file=joinpath(count_docs_dir, "$source.json"),
+)
     isfile(count_names_file) || return "Sorry, no stats found."
     namescount = JSON.parsefile(count_names_file)
     name = strip(name)
@@ -141,8 +131,12 @@ function stats_namescount(
         end
     end
     rev = place == "top" ? true : false
-    stats = sort(collect(namescount), by=x -> x[2]["count"], rev=rev)[1:min(end, number, 100)]
-    header = ifelse(place == "top", "**Top ", "**Bottom ") * "$(min(length(stats), number, 100)) stats**\n"
+    stats = sort(collect(namescount); by=x -> x[2]["count"], rev=rev)[1:min(
+        end, number, 100
+    )]
+    header =
+        ifelse(place == "top", "**Top ", "**Bottom ") *
+        "$(min(length(stats), number, 100)) stats**\n"
     header *= "≡"^(length(header) - 8) * "\n__Count__\t__Name__\n"
     contents = prod(map(s -> "$(s[2]["count"])\t\t\t`$(s[1])`\n", stats))
     return header * contents
@@ -154,7 +148,9 @@ end
 
 Delete the specified user's emoji from a Discord message.
 """
-function delete_emoji(c::Client, channel_id::UInt64, message_id::UInt64, user_id::UInt64, emoji::Emoji)
+function delete_emoji(
+    c::Client, channel_id::UInt64, message_id::UInt64, user_id::UInt64, emoji::Emoji
+)
     message = Message(; id=message_id, channel_id=channel_id)
     user = User(; id=user_id)
     return @discord delete(c, emoji, message, user)
@@ -165,7 +161,9 @@ end
 
 Update a Discord message with new content.
 """
-function update_message(c::Client, channel_id::UInt64, message_id::UInt64, content::AbstractString)
+function update_message(
+    c::Client, channel_id::UInt64, message_id::UInt64, content::AbstractString
+)
     message = Message(; id=message_id, channel_id=channel_id)
     return @discord update(c, message; content)
 end

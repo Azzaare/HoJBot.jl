@@ -1,5 +1,5 @@
 # Reactors
-# 
+#
 # On every MessageCreate event, we can apply a reaction to the message.
 # The code below can be easily extends by defining a subtype of
 # `AbstractReactor` and implement the respective interface methods.
@@ -10,8 +10,7 @@
 
 abstract type AbstractReactor end
 
-function reactions(r::AbstractReactor, m::Message)::Vector{Char}
-end
+function reactions(r::AbstractReactor, m::Message)::Vector{Char} end
 
 const NO_REACTION = Char[]
 
@@ -21,27 +20,41 @@ const NO_REACTION = Char[]
 
 const REACT_WORDS = Dict(
     :happy => [
-        "happy", "nice", "great", "awesome", "cheers", "yay", 
-        "congrat", "congrats", "congratulations",
-        "it helped", "it helps", "appreciate", "appreciated", "noice",
-        "thank", "thanks",
+        "happy",
+        "nice",
+        "great",
+        "awesome",
+        "cheers",
+        "yay",
+        "congrat",
+        "congrats",
+        "congratulations",
+        "it helped",
+        "it helps",
+        "appreciate",
+        "appreciated",
+        "noice",
+        "thank",
+        "thanks",
     ],
-    :disappointed => [
-        "disappointed", "unhappy", "sad", "aw shucks", "yeow",
-    ],
+    :disappointed => ["disappointed", "unhappy", "sad", "aw shucks", "yeow"],
     :excited => [
-        "excited", "fantastic", "fabulous", "wonderful",
-        "looking forward to", "love", "learned", "saved me", 
-        "beautiful"
+        "excited",
+        "fantastic",
+        "fabulous",
+        "wonderful",
+        "looking forward to",
+        "love",
+        "learned",
+        "saved me",
+        "beautiful",
     ],
-    :goodbye => [
-        "cya", "bye", "goodbye", "ciao", "adios", "brb"
-    ],
+    :goodbye => ["cya", "bye", "goodbye", "ciao", "adios", "brb"],
     :dog => ["dog", "dogs", "doggie", "shiba", "corgi", "chihuahua", "retriever"],
     :cat => ["cat", "cats", "feline", "kitten", "kittens"],
     :snake => ["snake", "snakes", "rattle", "python", "pythons"],
     :crab => ["crab", "crabs", "rust"],
-) 
+)
 
 function contains_any(s::AbstractString, words::AbstractVector{String})
     is_thing(x) = x !== nothing
@@ -53,8 +66,8 @@ end
 struct HappyReactor <: AbstractReactor end
 
 function reactions(::HappyReactor, m::Message)
-    if contains_any(m.content, REACT_WORDS[:happy]) && 
-            !contains_any(m.content, REACT_WORDS[:disappointed])
+    if contains_any(m.content, REACT_WORDS[:happy]) &&
+       !contains_any(m.content, REACT_WORDS[:disappointed])
         return ['😄']
     end
     return NO_REACTION
@@ -63,9 +76,9 @@ end
 struct DisappointedReactor <: AbstractReactor end
 
 function reactions(::DisappointedReactor, m::Message)
-    if contains_any(m.content, REACT_WORDS[:disappointed]) && 
-        !contains_any(m.content, REACT_WORDS[:happy]) &&
-        !contains_any(m.content, REACT_WORDS[:excited])
+    if contains_any(m.content, REACT_WORDS[:disappointed]) &&
+       !contains_any(m.content, REACT_WORDS[:happy]) &&
+       !contains_any(m.content, REACT_WORDS[:excited])
         return ['😞']
     end
     return NO_REACTION
@@ -75,8 +88,8 @@ struct ExcitedReactor <: AbstractReactor end
 
 function reactions(::ExcitedReactor, m::Message)
     if contains_any(m.content, REACT_WORDS[:excited]) &&
-            !contains_any(m.content, REACT_WORDS[:disappointed])
-    return ['🤩']
+       !contains_any(m.content, REACT_WORDS[:disappointed])
+        return ['🤩']
     end
     return NO_REACTION
 end

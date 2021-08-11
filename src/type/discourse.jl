@@ -23,7 +23,7 @@ struct DiscourseData
 end
 
 function Base.show(io::IO, d::DiscourseData)
-    print(io, "DiscourseData[index=", d.index, ", posts=", length(d.posts), "]")
+    return print(io, "DiscourseData[index=", d.index, ", posts=", length(d.posts), "]")
 end
 
 """
